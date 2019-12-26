@@ -1,5 +1,8 @@
 import React, {useState} from 'react';
-import { StyleSheet, Text, View, Image, TextInput, TouchableHighlight, ScrollView, KeyboardAvoidingView } from 'react-native';
+import axios from 'axios'
+import { StyleSheet, Text, View, Image, AsyncStorage
+  TextInput, TouchableHighlight, ScrollView,
+  KeyboardAvoidingView } from 'react-native';
 
 export default function App() {
   const [fields, setFields] = useState({
@@ -9,6 +12,21 @@ export default function App() {
 
   function handleChange (key, value) {
     setFields({...fields, [key]: value})
+  }
+
+  function handleClick () {
+    axios.post('http://click.7grid.ir/auth/signin/', fields)
+    .then(async (response) => {
+      console.log(response.data);
+      try {
+        await AsyncStorage.setItem('token', response.data.data.token);
+      } catch (error) {
+        console.log(error)
+      }
+    })
+    .catch(function (error) {
+      console.log(error.response);
+    });
   }
   return (
     <View style={styles.container}>
@@ -28,7 +46,7 @@ export default function App() {
       <View style={styles.login}>
         <TouchableHighlight
           underlayColor='red'
-          onPress={() => console.log('preessss', fields)}>
+          onPress={() => handleClick()}>
           <View style={styles.button}>
             <Text>Login</Text>
           </View>
